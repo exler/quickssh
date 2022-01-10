@@ -16,5 +16,5 @@ func Execute() error {
 }
 
 func init() {
-	Cmd.AddCommand(versionCmd, profileCmd)
+	Cmd.AddCommand(versionCmd, profileCmd, connectCmd, execCmd, fileCmd)
 }

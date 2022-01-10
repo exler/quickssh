@@ -1,9 +1,23 @@
 package internal
 
-import "strings"
+import (
+	"bufio"
+	"log"
+	"os"
+	"strings"
+)
 
-func CleanUserInput(text string) (cleaned string) {
-	cleaned = strings.Replace(text, "\n", "", -1)
-	cleaned = strings.Replace(cleaned, "\r", "", -1)
+func GetUserInput() (text string) {
+	text, _ = bufio.NewReader(os.Stdin).ReadString('\n')
+	text = strings.Trim(text, "\r\n")
 	return
+}
+
+func ParseUserAndHost(target string) (user, host string) {
+	res := strings.Split(target, "@")
+	if len(res) != 2 {
+		log.Fatalln("Wrong format of the target!")
+	}
+
+	return res[0], res[1]
 }

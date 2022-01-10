@@ -21,7 +21,36 @@ const (
 	profilesFilename = "profiles.json"
 )
 
-func getConfigPath(config string) string {
+func loadJSON(path string, data interface{}) {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		tmp := make(map[string]interface{})
+		saveJSON(path, &tmp)
+	}
+
+	file, err := os.ReadFile(path)
+	if err != nil {
+		log.Fatalln("Cannot read configuration file")
+	}
+
+	err = json.Unmarshal(file, &data)
+	if err != nil {
+		log.Fatalf("Cannot decode JSON data")
+	}
+}
+
+func saveJSON(filename string, data interface{}) {
+	file, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		log.Fatalln("Cannot encode data as JSON")
+	}
+
+	err = os.WriteFile(filename, file, 0600)
+	if err != nil {
+		log.Fatalln("Cannot save configuration file")
+	}
+}
+
+func getAppPath(config string) string {
 	userConfigDir, err := os.UserConfigDir()
 	if err != nil {
 		log.Fatalln("Cannot get user configuration directory")
@@ -36,34 +65,24 @@ func getConfigPath(config string) string {
 	return configPath
 }
 
-func GetProfiles() (config map[string]Profile) {
-	configPath := getConfigPath(profilesFilename)
-
-	if _, err := os.Stat(configPath); errors.Is(err, os.ErrNotExist) {
-		SetProfiles(make(map[string]Profile))
-	}
-
-	file, err := os.ReadFile(configPath)
-	if err != nil {
-		log.Fatalln("Cannot read configuration file")
-	}
-
-	err = json.Unmarshal(file, &config)
-	if err != nil {
-		log.Fatalf("Cannot decode JSON data")
-	}
+func GetProfiles() (profiles map[string]Profile) {
+	profilesPath := getAppPath(profilesFilename)
+	loadJSON(profilesPath, &profiles)
 	return
 }
 
-func SetProfiles(config map[string]Profile) {
-	configPath := getConfigPath(profilesFilename)
-	file, err := json.MarshalIndent(config, "", " ")
-	if err != nil {
-		log.Fatalln("Cannot encode data as JSON")
-	}
+func SetProfiles(profiles map[string]Profile) {
+	profilesPath := getAppPath(profilesFilename)
+	saveJSON(profilesPath, &profiles)
+}
 
-	err = os.WriteFile(configPath, file, 0600)
-	if err != nil {
-		log.Fatalln("Cannot save configuration file")
-	}
+func GetConfig() (config map[string]interface{}) {
+	configPath := getAppPath(configFilename)
+	loadJSON(configPath, &config)
+	return
+}
+
+func SetConfig(config map[string]interface{}) {
+	configPath := getAppPath(configFilename)
+	saveJSON(configPath, &config)
 }

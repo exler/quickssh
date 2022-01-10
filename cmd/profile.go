@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strconv"
 	"syscall"
 
@@ -15,7 +13,7 @@ import (
 var (
 	profileCmd = &cobra.Command{
 		Use:   "profile",
-		Short: "Add, edit, delete and list profiles",
+		Short: "Manage server profiles",
 	}
 
 	listProfileCmd = &cobra.Command{
@@ -36,7 +34,7 @@ var (
 		Short: "Add new profile",
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) != 1 {
-				fmt.Println("Provide the profile name as argument.")
+				fmt.Println("Provide the profile name as an argument.")
 				return
 			}
 			profileName := args[0]
@@ -47,16 +45,12 @@ var (
 				return
 			}
 
-			reader := bufio.NewReader(os.Stdin)
-
 			fmt.Print("Hostname: ")
-			host, _ := reader.ReadString('\n')
-			host = internal.CleanUserInput(host)
+			host := internal.GetUserInput()
 
 			fmt.Print("Port (default: 22): ")
-			portStr, _ := reader.ReadString('\n')
-			portStr = internal.CleanUserInput(portStr)
 			var port int
+			portStr := internal.GetUserInput()
 			if portStr == "" {
 				port = 22
 			} else {
@@ -64,8 +58,7 @@ var (
 			}
 
 			fmt.Print("Username: ")
-			user, _ := reader.ReadString('\n')
-			user = internal.CleanUserInput(user)
+			user := internal.GetUserInput()
 
 			fmt.Print("Password (optional): ")
 			pass, _ := term.ReadPassword(int(syscall.Stdin))
@@ -89,7 +82,7 @@ var (
 		Short: "Edit existing profile",
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) != 1 {
-				fmt.Println("Provide the profile name as argument.")
+				fmt.Println("Provide the profile name as an argument.")
 				return
 			}
 			profileName := args[0]
@@ -102,19 +95,15 @@ var (
 				return
 			}
 
-			reader := bufio.NewReader(os.Stdin)
-
 			fmt.Printf("Hostname (currently: %s): ", profile.Hostname)
-			host, _ := reader.ReadString('\n')
-			host = internal.CleanUserInput(host)
+			host := internal.GetUserInput()
 			if host == "" {
 				host = profile.Hostname
 			}
 
 			fmt.Printf("Port (currently: %d): ", profile.Port)
-			portStr, _ := reader.ReadString('\n')
-			portStr = internal.CleanUserInput(portStr)
 			var port int
+			portStr := internal.GetUserInput()
 			if portStr == "" {
 				port = profile.Port
 			} else {
@@ -122,8 +111,7 @@ var (
 			}
 
 			fmt.Printf("Username (currently: %s): ", profile.Username)
-			user, _ := reader.ReadString('\n')
-			user = internal.CleanUserInput(user)
+			user := internal.GetUserInput()
 			if user == "" {
 				user = profile.Username
 			}
@@ -150,7 +138,7 @@ var (
 		Short: "Delete existing profile",
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) != 1 {
-				fmt.Println("Provide the profile name as argument.")
+				fmt.Println("Provide the profile name as an argument.")
 				return
 			}
 			profileName := args[0]
