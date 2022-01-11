@@ -86,13 +86,13 @@ func Shell(c *ssh.Client) (err error) {
 		return
 	}
 
-	signalc := make(chan os.Signal)
+	signalc := make(chan os.Signal, 1)
 	defer func() {
 		signal.Reset()
 		close(signalc)
 	}()
 	go propagateSignals(signalc, session, stdin)
-	signal.Notify(signalc, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(signalc, syscall.SIGINT, syscall.SIGTERM)
 	return session.Wait()
 }
 
