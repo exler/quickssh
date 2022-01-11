@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 func GetUserInput() (text string) {
@@ -20,4 +22,12 @@ func ParseUserAndHost(target string) (user, host string) {
 	}
 
 	return res[0], res[1]
+}
+
+func GetTerminalSize() (width, height int) {
+	width, height, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		return 0, 0
+	}
+	return
 }

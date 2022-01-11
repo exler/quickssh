@@ -40,6 +40,12 @@ var connectCmd = &cobra.Command{
 			return
 		}
 		defer client.Close()
+
+		err = internal_ssh.Shell(client)
+		if err != nil {
+			log.Printf("SSH shell error: %s", err)
+			return
+		}
 	},
 }
 

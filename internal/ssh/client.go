@@ -1,12 +1,16 @@
 package internal_ssh
 
 import (
+	"fmt"
 	"io"
 	"net"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
+	"github.com/exler/quickssh/internal"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
@@ -40,6 +44,65 @@ func Run(command string, c *ssh.Client) error {
 	session.Run(command)
 
 	return nil
+}
+
+func Shell(c *ssh.Client) (err error) {
+	session, err := c.NewSession()
+	if err != nil {
+		return
+	}
+	defer session.Close()
+
+	stdin, err := session.StdinPipe()
+	if err != nil {
+		return err
+	}
+	go io.Copy(stdin, os.Stdin)
+
+	stdout, err := session.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	go io.Copy(os.Stdout, stdout)
+
+	stderr, err := session.StderrPipe()
+	if err != nil {
+		return err
+	}
+	go io.Copy(os.Stderr, stderr)
+
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,     // disable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	termWidth, termHeight := internal.GetTerminalSize()
+	if err = session.RequestPty("xterm", termWidth, termHeight, modes); err != nil {
+		return
+	}
+
+	if err = session.Shell(); err != nil {
+		return
+	}
+
+	signalc := make(chan os.Signal)
+	defer func() {
+		signal.Reset()
+		close(signalc)
+	}()
+	go propagateSignals(signalc, session, stdin)
+	signal.Notify(signalc, os.Interrupt, syscall.SIGTERM)
+	return session.Wait()
+}
+
+func propagateSignals(signalc chan os.Signal, session *ssh.Session, stdin io.WriteCloser) {
+	for s := range signalc {
+		switch s {
+		case os.Interrupt:
+			fmt.Fprint(stdin, "\x03")
+		}
+	}
 }
 
 func Download(localPath, remotePath string, c *ssh.Client) (err error) {
