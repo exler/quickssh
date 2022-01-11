@@ -1,0 +1,25 @@
+name: Release
+on:
+    release:
+        types:
+            - created
+
+jobs:
+    release:
+        name: Release Go binaries
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                goos: [linux, windows, darwin]
+                goarch: [amd64]
+        steps:
+            - uses: actions/checkout@v2
+            - uses: wangyoucao577/go-release-action@v1.22
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  goos: ${{ matrix.goos }}
+                  goarch: ${{ matrix.goarch }}
+                  goversion: "1.17"
+                  project_path: "."
+                  binary_name: "quickssh"
+                  extra_files: LICENSE README.md
