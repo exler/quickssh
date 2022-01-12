@@ -57,7 +57,7 @@ func getAppPath(config string) string {
 	}
 
 	configPath := filepath.Join(userConfigDir, appDir)
-	if err = os.Mkdir(configPath, 0600); os.IsNotExist(err) {
+	if err = os.Mkdir(configPath, 0700); os.IsNotExist(err) {
 		log.Fatalln("Cannot create app configuration directory")
 	}
 
