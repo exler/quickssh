@@ -2,7 +2,9 @@
     <img src="logo.png" width="168">
     <p align="center">🖥 SSH/SFTP profile manager and client</p>
     <p align="center">
+      <img src="https://img.shields.io/github/v/release/exler/quickssh?label=Release">
       <img src="https://github.com/exler/quickssh/actions/workflows/tests.yml/badge.svg">
+      <img src="https://img.shields.io/github/go-mod/go-version/exler/quickssh">
       <img alt="MIT License" src="https://img.shields.io/github/license/exler/quickssh?color=lightblue">
     </p>
 </p>
@@ -11,7 +13,7 @@
 
 QuickSSH manages your SSH server profiles and provides utility functions for performing common operations.
 
-QuickSSH currently supports password-based authentication and SSH agent forwarding (Unix only). 
+QuickSSH supports password authentication, key-based authentication and SSH agent forwarding (Unix only). 
 
 ## Installation
 

@@ -28,7 +28,7 @@ var connectCmd = &cobra.Command{
 			profile.Username, profile.Hostname = internal.ParseUserAndHost(target)
 		}
 
-		auth, err := internal_ssh.GetAuth(profile.Password)
+		auth, err := internal_ssh.GetAuth(profile.Keyfile)
 		if err != nil {
 			log.Printf("Authentication error: %s", err)
 			return

@@ -3,17 +3,16 @@ package cmd
 import (
 	"fmt"
 	"strconv"
-	"syscall"
 
 	internal "github.com/exler/quickssh/internal"
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 )
 
 var (
 	profileCmd = &cobra.Command{
-		Use:   "profile",
-		Short: "Manage server profiles",
+		Use:     "profile",
+		Short:   "Manage server profiles",
+		Aliases: []string{"profiles"},
 	}
 
 	listProfileCmd = &cobra.Command{
@@ -23,7 +22,11 @@ var (
 			profiles := internal.GetProfiles()
 			profileCnt := 1
 			for profileName, profile := range profiles {
-				fmt.Printf("%d) %s\n\tHostname: %s\n\tPort: %d\n\tUsername: %s\n", profileCnt, profileName, profile.Hostname, profile.Port, profile.Username)
+				fmt.Printf("%d) %s\n\tHostname: %s\n\tPort: %d\n\tUsername: %s", profileCnt, profileName, profile.Hostname, profile.Port, profile.Username)
+				if profile.Keyfile != "" {
+					fmt.Printf("\n\tKeyfile: %s", profile.Keyfile)
+				}
+				fmt.Print("\n")
 				profileCnt++
 			}
 		},
@@ -60,14 +63,14 @@ var (
 			fmt.Print("Username: ")
 			user := internal.GetUserInput()
 
-			fmt.Print("Password (optional): ")
-			pass, _ := term.ReadPassword(int(syscall.Stdin))
+			fmt.Print("Keyfile (optional): ")
+			keyfile := internal.GetUserInput()
 
 			profile := internal.Profile{
 				Hostname: host,
 				Port:     port,
 				Username: user,
-				Password: string(pass),
+				Keyfile:  keyfile,
 			}
 
 			profiles[profileName] = profile
@@ -116,14 +119,14 @@ var (
 				user = profile.Username
 			}
 
-			fmt.Print("Password (optional): ")
-			pass, _ := term.ReadPassword(int(syscall.Stdin))
+			fmt.Print("Keyfile (optional): ")
+			keyfile := internal.GetUserInput()
 
 			changedProfile := internal.Profile{
 				Hostname: host,
 				Port:     port,
 				Username: user,
-				Password: string(pass),
+				Keyfile:  keyfile,
 			}
 
 			profiles[profileName] = changedProfile

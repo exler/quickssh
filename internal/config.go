@@ -12,7 +12,7 @@ type Profile struct {
 	Hostname string
 	Port     int
 	Username string
-	Password string
+	Keyfile  string
 }
 
 const (

@@ -1,6 +1,7 @@
 package internal_ssh
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -13,18 +14,31 @@ import (
 
 type Auth []ssh.AuthMethod
 
-func GetAuth(password string) (auth Auth, err error) {
+func GetAuth(keyfile string) (auth Auth, err error) {
 	if HasAgent() {
 		auth, err = GetAgent()
 		if err != nil {
 			return
 		}
-	} else {
-		if password == "" {
-			passwordBytes, _ := term.ReadPassword(int(syscall.Stdin))
-			password = string(passwordBytes)
+	} else if keyfile != "" {
+		auth, err = Key(keyfile, "")
+		if err != nil {
+			if errors.Is(err, &ssh.PassphraseMissingError{}) {
+				fmt.Print("Key passphrase: ")
+				passphraseBytes, _ := term.ReadPassword(int(syscall.Stdin))
+				passphrase := string(passphraseBytes)
+				auth, err = Key(keyfile, passphrase)
+				if err != nil {
+					return
+				}
+			} else {
+				return
+			}
 		}
-
+	} else {
+		fmt.Print("Password: ")
+		passwordBytes, _ := term.ReadPassword(int(syscall.Stdin))
+		password := string(passwordBytes)
 		auth = Password(password)
 	}
 	return
