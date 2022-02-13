@@ -24,7 +24,7 @@ QuickSSH supports password authentication, key-based authentication and SSH agen
 You can use Go to compile and install the package to your `$GOBIN` directory.
 
 ```bash
-$ go install github.com/exler/quickssh
+$ go install github.com/exler/quickssh@latest
 ```
 
 ### Releases
