@@ -19,7 +19,7 @@ QuickSSH supports password authentication, key-based authentication and SSH agen
 
 ### Go
 
-**Requires**: Go >= 1.17
+**Requires**: Go >= 1.20
 
 You can use Go to compile and install the package to your `$GOBIN` directory.
 
